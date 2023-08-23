@@ -174,7 +174,8 @@
 
         </div>
         <div style="margin-top: 10px;">
-            Fonte: <a href="https://www.nepa.unicamp.br/taco/tabela.php?ativo=tabela">Unicamp - https://www.nepa.unicamp.br/taco/tabela.php?ativo=tabela</a>
+            Fonte: <a href="https://www.nepa.unicamp.br/taco/tabela.php?ativo=tabela">Unicamp -
+                https://www.nepa.unicamp.br/taco/tabela.php?ativo=tabela</a>
         </div>
     </div>
     <script>
@@ -791,68 +792,80 @@
                 var kcal = item['Energia(Kcal)'] != "*" ? parseFloat(item['Energia(Kcal)']).toFixed(0) : "n/a";
 
                 row.innerHTML = `
-          <td>${item.Numero}</td>
-          <td>${item.Grupo}</td>
-          <td>${item.DescricaoDoAlimento}</td>
-          <td>${item["Umidade(%)"]}</td>
-          <td>${kcal}</td>
-          <td>${item["Energia(Kj)"]}</td>
-          <td>${item["Proteina(G)"]}</td>
-          <td>${item["Lipídeos(G)"]}</td>
-          <td>${item["Colesterol(Mg)"]}</td>
-          <td>${item["Carboidrato(G)"]}</td>
-          <td>${item["FibraAlimentar(G)"]}</td>
-          <td>${item["Cinzas(G)"]}</td>
-          <td>${item["Calcio(Mg)"]}</td>
-          <td>${item["Magnesio(Mg)"]}</td>
-          <td>${item["Manganes(Mg)"]}</td>
-          <td>${item["Fosforo(Mg)"]}</td>
-          <td>${item["Ferro(Mg)"]}</td>
-          <td>${item["Sodio(Mg)"]}</td>
-          <td>${item["Potassio(Mg)"]}</td>
-          <td>${item["Cobre(Mg)"]}</td>
-          <td>${item["Zinco(Mg)"]}</td>
-          <td>${item["Retinol(Mcg)"]}</td>
-          <td>${item["Re(Mcg)"]}</td>
-          <td>${item["Rae(Mcg)"]}</td>
-          <td>${item["Tiamina(Mg)"]}</td>
-          <td>${item["Riboflavina(Mg)"]}</td>
-          <td>${item["Piridoxina(Mg)"]}</td>
-          <td>${item["Niacina(Mg)"]}</td>
-          <td>${item["Vitaminac(Mg)"]}</td>
-        `;
+                <td>${item.Numero}</td>
+                <td>${item.Grupo}</td>
+                <td>${item.DescricaoDoAlimento}</td>
+                <td>${item["Umidade(%)"]}</td>
+                <td>${kcal}</td>
+                <td>${item["Energia(Kj)"]}</td>
+                <td>${item["Proteina(G)"]}</td>
+                <td>${item["Lipídeos(G)"]}</td>
+                <td>${item["Colesterol(Mg)"]}</td>
+                <td>${item["Carboidrato(G)"]}</td>
+                <td>${item["FibraAlimentar(G)"]}</td>
+                <td>${item["Cinzas(G)"]}</td>
+                <td>${item["Calcio(Mg)"]}</td>
+                <td>${item["Magnesio(Mg)"]}</td>
+                <td>${item["Manganes(Mg)"]}</td>
+                <td>${item["Fosforo(Mg)"]}</td>
+                <td>${item["Ferro(Mg)"]}</td>
+                <td>${item["Sodio(Mg)"]}</td>
+                <td>${item["Potassio(Mg)"]}</td>
+                <td>${item["Cobre(Mg)"]}</td>
+                <td>${item["Zinco(Mg)"]}</td>
+                <td>${item["Retinol(Mcg)"]}</td>
+                <td>${item["Re(Mcg)"]}</td>
+                <td>${item["Rae(Mcg)"]}</td>
+                <td>${item["Tiamina(Mg)"]}</td>
+                <td>${item["Riboflavina(Mg)"]}</td>
+                <td>${item["Piridoxina(Mg)"]}</td>
+                <td>${item["Niacina(Mg)"]}</td>
+                <td>${item["Vitaminac(Mg)"]}</td>
+                `;
                 tableBody.appendChild(row);
-
 
                 const card = document.createElement('div');
                 card.classList.add('card');
                 card.innerHTML = `
-            <div class="card-header">
-                <strong>${item.DescricaoDoAlimento}</strong>
-            </div>
-            <div class="card-content">
-            <span><strong>Grupo:</strong> ${item.Grupo}</span>
-            <span><strong>Energia (Kcal):</strong> ${kcal}</span>
-            </div>
-        `;
+                    <div class="card-header">
+                        <strong>${item.DescricaoDoAlimento}</strong>
+                    </div>
+                    <div class="card-content">
+                        <span><strong>Grupo:</strong> ${item.Grupo}</span>
+                        <span><strong>Energia (Kcal):</strong> ${kcal}</span>
+                    </div>
+                `;
                 tableCard.appendChild(card);
             });
         }
-        function removeAcento(text) {
+
+        function prepareTextToSearch(text) {
+            if (!text) {
+                return text;
+            }
             text = text.toLowerCase();
+            //remove acentos
             text = text.replace(new RegExp('[ÁÀÂÃ]', 'gi'), 'a');
             text = text.replace(new RegExp('[ÉÈÊ]', 'gi'), 'e');
             text = text.replace(new RegExp('[ÍÌÎ]', 'gi'), 'i');
             text = text.replace(new RegExp('[ÓÒÔÕ]', 'gi'), 'o');
             text = text.replace(new RegExp('[ÚÙÛ]', 'gi'), 'u');
             text = text.replace(new RegExp('[Ç]', 'gi'), 'c');
+            //remove non desired characteres
+            text = text.replace(/[^a-z0-1 ]/gm, ' ');
+            //remove extra spaces
+            text = text.replace(/[ ]{2,}/gm, ' ');
             return text;
         }
 
         function searchByDescription() {
-            var searchInput = removeAcento(document.getElementById("searchInput").value.toLowerCase());
+            var searchInput = prepareTextToSearch(document.getElementById("searchInput").value);
+            if (!searchInput) {
+                renderTable(jsonData);
+                return;
+            }
             var filteredData = jsonData.filter(function (item) {
-                let description = removeAcento(item.DescricaoDoAlimento.toLocaleLowerCase()).replace(/[^a-z0-1 ]/gm, ' ').replace(/[ ]{2,}/gm, ' ');
+                let description = prepareTextToSearch(item.DescricaoDoAlimento);
                 let searchList = searchInput.split(' ');
                 var result = true;
                 // sequence independent search
@@ -863,13 +876,8 @@
                         break;
                     }
                 }
-                // searchList.forEach(e=> {
-                //     if(!description.includes(e)){
-                //         result = false;
-                //     }
-                // })
-
-                // return description.includes(searchInput); // search the correct sequence
+                // search the correct sequence
+                // return description.includes(searchInput); 
                 return result;
             });
             renderTable(filteredData);
